@@ -1,78 +1,42 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import { BoxContainer, ErrorText, FormContainer, Input, LoginSuccess, SubmitButton, Title, Wrapper } from "../../common/common";
-import { validate } from "../../common/validation";
+import { BoxContainer, ErrorText, FormContainer, Input, SubmitButton, Title, Wrapper } from "../../common/common";
+import { useForm } from "react-hook-form";
 
 const LoginForm = () => {
-    const initialValues = {
-        username: "",
-        email: "",
-        password: ""
-    };
-    const [formValues, setFormValues] = useState(initialValues);
-    const [formErrors, setFormErrors] = useState({});
-    const [isSubmit, setIsSubmit] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormValues({ ...formValues, [name]: value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setFormErrors(validate(formValues));
-        setIsSubmit(true);
-    };
-
-    useEffect(() => {
-        console.log(formErrors);
-        if (Object.keys(formErrors).length === 0 && isSubmit) {
-            console.log(formValues);
-        }
-    }, [formErrors, formValues, isSubmit]);
-    
+    const { register, formState: { errors }, handleSubmit } = useForm();
+    const onSubmit = (data) => console.log(data);
+        
     return (
     <Wrapper>
         <BoxContainer>
-            <FormContainer onSubmit={handleSubmit}>
+            <FormContainer onSubmit={handleSubmit(onSubmit)}>
                 <Title>Login</Title>
                 <Input 
-                    type="text"                    
-                    name="email"
+                    type="text"     
                     placeholder="Please enter your email"
-                    value={formValues.email}
-                    onChange={handleChange}
+                    {...register("email", { required: true })} 
+                        aria-invalid={errors.email ? "true" : "false"} 
                 />
-                <ErrorText>{formErrors.email}</ErrorText>
-
+                {errors.email?.type === 'required' && <ErrorText>Email is required! </ErrorText>}
+                
                 <Input 
-                    type="text"
-                    name="username"
+                    type="text"                    
                     placeholder="Please enter your name"
-                    value={formValues.username}
-                    onChange={handleChange}
+                    {...register("name", { required: true })} 
+                        aria-invalid={errors.name ? "true" : "false"} 
                 />
-                <ErrorText>{formErrors.username}</ErrorText>
+                {errors.name?.type === 'required' && <ErrorText>Name is required!</ErrorText>}
 
                 <Input
                     type="password"
-                    name="password"
                     placeholder="Please enter your password"
-                    value={formValues.password}
-                    onChange={handleChange}
+                    {...register("password", { required: true })} 
+                        aria-invalid={errors.password ? "true" : "false"} 
                  />
-                <ErrorText>{formErrors.password}</ErrorText>
+                 {errors.password?.type === 'required' && <ErrorText>Password is required!</ErrorText>}
 
                 <SubmitButton type="submit">Submit</SubmitButton>
             </FormContainer>
-            
-            {Object.keys(formErrors).length === 0 && isSubmit ? (
-                <LoginSuccess>
-                    Signed in successfully
-                </LoginSuccess>
-            ) : (
-                console.log("Entered Details", formValues)
-            )}
         </BoxContainer>
     </Wrapper>
     );
